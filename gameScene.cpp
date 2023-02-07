@@ -8,7 +8,9 @@
 #include "PhysicsRippleSprite.h"
 #include "json/rapidjson.h"
 #include "json/document.h"
+#include "AudioEngine.h"
 using namespace cocos2d;
+using namespace experimental;
 Scene* gameScene::createScene() {
 	auto scene = Scene::create();
 	auto layer = gameScene::create();
@@ -70,7 +72,7 @@ void gameScene::timeCounter() {
 	cbTimeCounter->start(timePointArray, [&]() {
 		noteBorn();
 	});
-	this->schedule(schedule_selector(gameScene::noteLifeListener), 0.5f);
+	this->schedule(schedule_selector(gameScene::noteLifeListener), 0.15f);
 }
 
 void gameScene::noteLifeListener(float dt) {
@@ -78,7 +80,7 @@ void gameScene::noteLifeListener(float dt) {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	for (auto& i : Notes) {
 		if (i->getTagPosition().y <= visibleSize.height/2-350 && i->noteState==alive) {
-			log("CatchIt!");
+			//log("CatchIt!");
 			calCombo(i->getTagPosition(), 1);
 			noteRemove(i,2);
 			missNum++;
@@ -92,7 +94,10 @@ void gameScene::noteRemove(Player* pnote,int Type) {
 	deadNote->noteState = dead;
 	Sprite* sprite;
 	if (Type == 1)sprite = Sprite::create("../Resources/true.png");
-	if (Type == 2)sprite = Sprite::create("../Resources/false.png");
+	if (Type == 2) {
+		sprite = Sprite::create("../Resources/false.png");
+		failEffectID = AudioEngine::play2d("fail_sound.mp3");
+	}
 	Player* afterNote = Player::create();
 	afterNote->bindSprite(sprite);
 	afterNote->setPosition(deadNote->getTagPosition());
@@ -102,7 +107,7 @@ void gameScene::noteRemove(Player* pnote,int Type) {
 	Action* actionOut = Sequence::create(forwardOut, NULL);
 	afterNote->runAction(actionOut);
 	deadNote->removeFromParent();
-	log("removeSuccess");
+	//log("removeSuccess");
 }
 
 void gameScene::createUI() {
@@ -130,7 +135,8 @@ void gameScene::createUI() {
 	gameScore->setPosition(visibleSize.width / 2, visibleSize.height - 48);
 	this->addChild(gameScore);
 	score = 0;
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("BOW.mp3", true);
+	//CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("revolution.mp3", true);
+	backgroundMusicID = AudioEngine::play2d("revolution.mp3");
 	particleSystem = ParticleSystemQuad::create("falling-dust.plist");
 	//particleSystem->setBlendAdditive(true);
 	particleSystem->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
@@ -142,15 +148,15 @@ void gameScene::TouchesBegan(Touch* touch, Event* event) {
 	gameBackground->addRipple(Point(touch->getLocation().x, touch->getLocation().y), 1);
 	if (perfectRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
 		for (auto& i : Notes) {
-			log("i=%d", i->bornX);
+			//log("i=%d", i->bornX);
 			if (perfectRect.containsPoint(i->getTagPosition()) && i->noteState==alive) {
 				//log("x=%f y=%f", i->getTagPosition().x, i->getTagPosition().y);
 				//log("xx=%f yy=%f", touch->getLocation().x, touch->getLocation().y);
 				Size visibleSize = Director::getInstance()->getVisibleSize();
 				Rect LRRect;
-				LRRect=CCRectMake(i->bornX - 40, visibleSize.height / 2 - 275 , 80 , 50);
+				LRRect=CCRectMake(i->bornX - 40, visibleSize.height / 2 - 275, 80, 50);
 				if (LRRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
-					log("perfect!");
+					//log("perfect!");
 					gameScene::newScore(2);
 					gameScene::noteRemove(i,1);
 					perfectNum++;
@@ -165,9 +171,9 @@ void gameScene::TouchesBegan(Touch* touch, Event* event) {
 				//log("xx=%f yy=%f", touch->getLocation().x, touch->getLocation().y);
 				Size visibleSize = Director::getInstance()->getVisibleSize();
 				Rect LRRect;
-				LRRect = CCRectMake(i->bornX - 40, visibleSize.height / 2-300, 80, 100);
+				LRRect = CCRectMake(i->bornX - 40, visibleSize.height / 2 - 300, 80, 100);
 				if (LRRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
-					log("great!");
+					//log("great!");
 					gameScene::newScore(1);
 					gameScene::noteRemove(i,1);
 					greatNum++;
@@ -207,6 +213,6 @@ void gameScene::newScore(int addiScore) {
 	score+=addiScore;
 	String* content = String::createWithFormat("%d", score);
 	const char* s = content->getCString();
-	log("score=%d", score);
+	//log("score=%d", score);
 	gameScore->setString(s);
 }

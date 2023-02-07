@@ -56,4 +56,6 @@ public:
 	void loadData();
 	std::vector<float> timePointArray;
 	ParticleSystemQuad* particleSystem;
+	int backgroundMusicID;
+	int failEffectID;
 };

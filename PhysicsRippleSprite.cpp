@@ -1,5 +1,3 @@
-// PhysicsRippleSprite.cpp
-
 #include "PhysicsRippleSprite.h"
 #include <algorithm>
 PhysicsRippleSprite*
@@ -286,7 +284,7 @@ void PhysicsRippleSprite::addRipple(const CCPoint& pos, float strength) {
 	int xIndex = (int)((pos.x / textureSize.width) * m_config.quadCountX);
 	int yIndex = (int)((pos.y / textureSize.height) * m_config.quadCountY);
 
-	//产生波纹的不是一个点而是一个范围
+	//产生波纹
 	int touchRadius = int(strength * m_config.touchRadius);
 	generateRippleCoeff(touchRadius);
 

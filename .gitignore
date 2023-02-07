@@ -157,3 +157,4 @@ Debug.win32/websockets.lib
 Debug.win32/zlib1.dll
 game.aps
 game.rc
+*.vsidx
