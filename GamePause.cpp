@@ -1,6 +1,13 @@
 #include"GamePause.h"
 #include"cocos2d.h"
+#include"cocos-ext.h"
+#include "AudioEngine.h"
+using namespace experimental;
 using namespace cocos2d;
+using namespace cocos2d::extension;
+
+float GamePause::volumeFloat = 0.5;
+
 Scene* GamePause::scene(RenderTexture* sqr) {
 	Scene* scene = Scene::create();
 	GamePause* layer = GamePause::create();
@@ -36,9 +43,36 @@ bool GamePause::init()
 	CCMenu* pMenu = CCMenu::create(pContinueItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 2);
+
+	volumeController = ControlSlider::create(
+		"slider_before.png",
+		"slider_after.png",
+		"slider_btn.png"
+	);
+	volumeController->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 30));
+	this->addChild(volumeController);
+	volumeController->setMinimumValue(0);         //设置滑块最小值
+	volumeController->setMaximumValue(1);       //设置滑块最大值
+	volumeController->setMinimumAllowedValue(0); //设置允许滑动的最小值
+	volumeController->setMaximumAllowedValue(1); //设置允许滑动的最大值
+	volumeController->setValue(volumeFloat);
+	volumeController->addTargetWithActionForControlEvents(this, cccontrol_selector(GamePause::volumeChanged), Control::EventType::VALUE_CHANGED);
+
+	AudioEngine::pauseAll();
+	log("PausePending");
 	return true;
 }
 void GamePause::menuContinueCallback(Object* pSender)
 {
 	Director::sharedDirector()->popScene();
+	AudioEngine::resumeAll();
+}
+void GamePause::volumeChanged(Object* pSender, Control::EventType controlEvent)
+{
+	ControlSlider* slider = (ControlSlider*)pSender;
+	volumeFloat = slider->getValue();
+	//log("Volume = %f", volumeFloat);
+}
+float GamePause::getVolumeFloat() {
+	return volumeFloat;
 }

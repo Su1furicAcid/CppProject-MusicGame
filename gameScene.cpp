@@ -164,9 +164,11 @@ void gameScene::createUI() {
 	Menu* menu = Menu::create(settingOption, NULL);
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 100);
+	this->schedule(schedule_selector(gameScene::volumeListener), 0.1f);
 }
 
 void gameScene::gamePause(Object* pSender) {
+	log("PauseBegan");
 	Size visibleSize = Director::sharedDirector()->getVisibleSize();
 	RenderTexture* renderTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
 	//遍历当前类的所有子节点信息，画入renderTexture中。
@@ -176,6 +178,13 @@ void gameScene::gamePause(Object* pSender) {
 	renderTexture->end();
 	//将游戏界面暂停，压入场景堆栈。并切换到GamePause界面
 	Director::sharedDirector()->pushScene(GamePause::scene(renderTexture));
+	log("PauseEnded");
+}
+
+void gameScene::volumeListener(float dt) {
+	volume = GamePause::getVolumeFloat();
+	//log("volume = %f", volume);
+	AudioEngine::setVolume(0, volume);
 }
 
 void gameScene::TouchesBegan(Touch* touch, Event* event) {

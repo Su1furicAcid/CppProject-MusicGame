@@ -60,4 +60,6 @@ public:
 	int failEffectID;
 	//Sprite* settingOption;
 	void gamePause(Object* pSender);
+	float volume;
+	void volumeListener(float dt);
 };
