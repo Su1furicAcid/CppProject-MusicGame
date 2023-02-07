@@ -9,6 +9,7 @@
 #include "json/rapidjson.h"
 #include "json/document.h"
 #include "AudioEngine.h"
+#include "GamePause.h"
 using namespace cocos2d;
 using namespace experimental;
 Scene* gameScene::createScene() {
@@ -142,6 +143,39 @@ void gameScene::createUI() {
 	particleSystem->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
 	this->addChild(particleSystem, 10);
 	//log("create!");
+	/*settingOption = Sprite::create("../Resources/setting.png");
+	settingOption->setPosition(Point(visibleSize.width - 30, visibleSize.height - 60));
+	this->addChild(settingOption, 100);
+	EventListenerTouchOneByOne* settingListener = EventListenerTouchOneByOne::create();
+	settingListener->onTouchBegan = [](Touch* touch, Event* event) {
+		return true;
+	};
+	settingListener->onTouchEnded = [=](Touch* touch, Event* event) {
+		gamePause();
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(settingListener, settingOption);*/
+	MenuItemImage* settingOption = MenuItemImage::create(
+		"setting.png",
+		"setting.png",
+		this,
+		menu_selector(gameScene::gamePause)
+	);
+	settingOption->setPosition(Point(visibleSize.width - 30, visibleSize.height - 60));
+	Menu* menu = Menu::create(settingOption, NULL);
+	menu->setPosition(Point::ZERO);
+	this->addChild(menu, 100);
+}
+
+void gameScene::gamePause(Object* pSender) {
+	Size visibleSize = Director::sharedDirector()->getVisibleSize();
+	RenderTexture* renderTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
+	//遍历当前类的所有子节点信息，画入renderTexture中。
+	//这里类似截图。
+	renderTexture->begin();
+	this->getParent()->visit();
+	renderTexture->end();
+	//将游戏界面暂停，压入场景堆栈。并切换到GamePause界面
+	Director::sharedDirector()->pushScene(GamePause::scene(renderTexture));
 }
 
 void gameScene::TouchesBegan(Touch* touch, Event* event) {

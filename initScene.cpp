@@ -27,9 +27,9 @@ bool initScene::init() {
 		Point pos1 = touch->getLocation();        /* 获取单击坐标，基于3D */
 		Point pos2 = touch->getLocationInView();   /* 获取单击坐标，基于2D */
 		Point pos3 = Director::getInstance()->convertToGL(pos2);   /* 获取单击坐标，基于Cocos2d-x */
-		log("HelloWorldScene onTouchBegan! pos1 x=%f, y=%f", pos1.x, pos1.y);
-		log("HelloWorldScene onTouchBegan! pos2 x=%f, y=%f", pos2.x, pos2.y);
-		log("HelloWorldScene onTouchBegan! pos3 x=%f, y=%f", pos3.x, pos3.y);
+		//log("HelloWorldScene onTouchBegan! pos1 x=%f, y=%f", pos1.x, pos1.y);
+		//log("HelloWorldScene onTouchBegan! pos2 x=%f, y=%f", pos2.x, pos2.y);
+		//log("HelloWorldScene onTouchBegan! pos3 x=%f, y=%f", pos3.x, pos3.y);
 		return true;
 	};
 	listener->onTouchMoved = [](Touch* touch, Event* event) {
