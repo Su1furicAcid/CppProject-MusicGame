@@ -44,12 +44,16 @@ bool GamePause::init()
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 2);
 
+	Label* volumeControlText = Label::create("Volume", "Arial", 20);
+	volumeControlText->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 30));
+	this->addChild(volumeControlText);
+
 	volumeController = ControlSlider::create(
 		"slider_before.png",
 		"slider_after.png",
 		"slider_btn.png"
 	);
-	volumeController->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 30));
+	volumeController->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 60));
 	this->addChild(volumeController);
 	volumeController->setMinimumValue(0);         //设置滑块最小值
 	volumeController->setMaximumValue(1);       //设置滑块最大值

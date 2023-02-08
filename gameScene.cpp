@@ -1,15 +1,16 @@
-#include"cocos2d.h"
-#include"gameScene.h"
-#include"CallbackTimeCounter.h"
-#include"Player.h"
-#include"Entity.h"
-#include"SimpleMoveController.h"
-#include<vector>
+#include "cocos2d.h"
+#include "gameScene.h"
+#include "CallbackTimeCounter.h"
+#include "Player.h"
+#include "Entity.h"
+#include "SimpleMoveController.h"
+#include <vector>
 #include "PhysicsRippleSprite.h"
 #include "json/rapidjson.h"
 #include "json/document.h"
 #include "AudioEngine.h"
 #include "GamePause.h"
+#include "GameQuit.h"
 using namespace cocos2d;
 using namespace experimental;
 Scene* gameScene::createScene() {
@@ -94,10 +95,15 @@ void gameScene::noteRemove(Player* pnote,int Type) {
 	if (deadNote == NULL)return;
 	deadNote->noteState = dead;
 	Sprite* sprite;
-	if (Type == 1)sprite = Sprite::create("../Resources/true.png");
+	if (Type == 1) {
+		sprite = Sprite::create("../Resources/true.png");
+		successEffectID = AudioEngine::play2d("success_sound.mp3");
+		AudioEngine::setVolume(successEffectID, volume);
+	}
 	if (Type == 2) {
 		sprite = Sprite::create("../Resources/false.png");
 		failEffectID = AudioEngine::play2d("fail_sound.mp3");
+		AudioEngine::setVolume(failEffectID, volume);
 	}
 	Player* afterNote = Player::create();
 	afterNote->bindSprite(sprite);
@@ -138,6 +144,7 @@ void gameScene::createUI() {
 	score = 0;
 	//CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("revolution.mp3", true);
 	backgroundMusicID = AudioEngine::play2d("revolution.mp3");
+	AudioEngine::setVolume(backgroundMusicID, 0.5);
 	particleSystem = ParticleSystemQuad::create("falling-dust.plist");
 	//particleSystem->setBlendAdditive(true);
 	particleSystem->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
@@ -160,15 +167,32 @@ void gameScene::createUI() {
 		this,
 		menu_selector(gameScene::gamePause)
 	);
+	MenuItemImage* quitOption = MenuItemImage::create(
+		"quit.png",
+		"quit.png",
+		this,
+		menu_selector(gameScene::gameQuit)
+	);
 	settingOption->setPosition(Point(visibleSize.width - 30, visibleSize.height - 60));
-	Menu* menu = Menu::create(settingOption, NULL);
+	quitOption->setPosition(Point(visibleSize.width - 30, visibleSize.height - 180));
+	Menu* menu = Menu::create(settingOption, quitOption, NULL);
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 100);
 	this->schedule(schedule_selector(gameScene::volumeListener), 0.1f);
 }
 
+void gameScene::gameQuit(Object* pSender)
+{
+	Size visibleSize = Director::sharedDirector()->getVisibleSize();
+	RenderTexture* renderTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
+	renderTexture->begin();
+	this->getParent()->visit();
+	renderTexture->end();
+	Director::sharedDirector()->pushScene(GameQuit::scene(renderTexture));
+}
+
 void gameScene::gamePause(Object* pSender) {
-	log("PauseBegan");
+	//log("PauseBegan");
 	Size visibleSize = Director::sharedDirector()->getVisibleSize();
 	RenderTexture* renderTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
 	//遍历当前类的所有子节点信息，画入renderTexture中。
@@ -178,13 +202,13 @@ void gameScene::gamePause(Object* pSender) {
 	renderTexture->end();
 	//将游戏界面暂停，压入场景堆栈。并切换到GamePause界面
 	Director::sharedDirector()->pushScene(GamePause::scene(renderTexture));
-	log("PauseEnded");
+	//log("PauseEnded");
 }
 
 void gameScene::volumeListener(float dt) {
 	volume = GamePause::getVolumeFloat();
 	//log("volume = %f", volume);
-	AudioEngine::setVolume(0, volume);
+	AudioEngine::setVolume(backgroundMusicID, volume);
 }
 
 void gameScene::TouchesBegan(Touch* touch, Event* event) {

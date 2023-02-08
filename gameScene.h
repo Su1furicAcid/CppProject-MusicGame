@@ -58,8 +58,10 @@ public:
 	ParticleSystemQuad* particleSystem;
 	int backgroundMusicID;
 	int failEffectID;
+	int successEffectID;
 	//Sprite* settingOption;
 	void gamePause(Object* pSender);
 	float volume;
 	void volumeListener(float dt);
+	void gameQuit(Object* pSender);
 };
