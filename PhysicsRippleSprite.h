@@ -7,10 +7,10 @@ using std::map;
 USING_NS_CC;
 
 struct PhysicsRippleSpriteConfig {
-	int quadCountX{ 80 };
-	int quadCountY{ 80 };
-	int touchRadius{ 1 };
-	float updateInterval{ 1 / 60.0f };
+	int quadCountX{ 240 };
+	int quadCountY{ 240 };
+	int touchRadius{ 4 };
+	float updateInterval{ 1 / 90.0f };
 
 	PhysicsRippleSpriteConfig() {
 	}

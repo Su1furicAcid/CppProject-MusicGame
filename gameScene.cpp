@@ -78,11 +78,10 @@ void gameScene::timeCounter() {
 }
 
 void gameScene::noteLifeListener(float dt) {
-	//log("ReachHere");
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	for (auto& i : Notes) {
 		if (i->getTagPosition().y <= visibleSize.height/2-350 && i->noteState==alive) {
-			//log("CatchIt!");
+			//判断是否超出判定区
 			calCombo(i->getTagPosition(), 1);
 			noteRemove(i,2);
 			missNum++;
@@ -118,6 +117,7 @@ void gameScene::noteRemove(Player* pnote,int Type) {
 }
 
 void gameScene::createUI() {
+	//创建场景内的UI元素
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Sprite* checkLine = Sprite::create("../Resources/line.png");
 	checkLine->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
@@ -134,7 +134,6 @@ void gameScene::createUI() {
 	};
 	listener->onTouchEnded = [=](Touch* touch, Event* event) {
 		gameScene::TouchesEnded(touch, event);
-		//log("successTouch!");
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, gameBackground);
 	listener->setSwallowTouches(true);
@@ -149,7 +148,7 @@ void gameScene::createUI() {
 	//particleSystem->setBlendAdditive(true);
 	particleSystem->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
 	this->addChild(particleSystem, 10);
-	//log("create!");
+	//以下注释代码运行的不是很好
 	/*settingOption = Sprite::create("../Resources/setting.png");
 	settingOption->setPosition(Point(visibleSize.width - 30, visibleSize.height - 60));
 	this->addChild(settingOption, 100);
@@ -206,24 +205,22 @@ void gameScene::gamePause(Object* pSender) {
 }
 
 void gameScene::volumeListener(float dt) {
+	//调整音量
 	volume = GamePause::getVolumeFloat();
-	//log("volume = %f", volume);
 	AudioEngine::setVolume(backgroundMusicID, volume);
 }
 
 void gameScene::TouchesBegan(Touch* touch, Event* event) {
 	gameBackground->addRipple(Point(touch->getLocation().x, touch->getLocation().y), 1);
+	//首先比较上下位置
 	if (perfectRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
 		for (auto& i : Notes) {
-			//log("i=%d", i->bornX);
 			if (perfectRect.containsPoint(i->getTagPosition()) && i->noteState==alive) {
-				//log("x=%f y=%f", i->getTagPosition().x, i->getTagPosition().y);
-				//log("xx=%f yy=%f", touch->getLocation().x, touch->getLocation().y);
 				Size visibleSize = Director::getInstance()->getVisibleSize();
 				Rect LRRect;
 				LRRect=CCRectMake(i->bornX - 40, visibleSize.height / 2 - 275, 80, 50);
 				if (LRRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
-					//log("perfect!");
+					//然后进行左右位置的比较
 					gameScene::newScore(2);
 					gameScene::noteRemove(i,1);
 					perfectNum++;
@@ -234,8 +231,6 @@ void gameScene::TouchesBegan(Touch* touch, Event* event) {
 	}else if (greatRect.containsPoint(ccp(touch->getLocation().x, touch->getLocation().y))) {
 		for (auto& i : Notes) {
 			if (greatRect.containsPoint(i->getTagPosition()) && i->noteState == alive) {
-				//log("x=%f y=%f", i->getTagPosition().x, i->getTagPosition().y);
-				//log("xx=%f yy=%f", touch->getLocation().x, touch->getLocation().y);
 				Size visibleSize = Director::getInstance()->getVisibleSize();
 				Rect LRRect;
 				LRRect = CCRectMake(i->bornX - 40, visibleSize.height / 2 - 300, 80, 100);
@@ -252,6 +247,7 @@ void gameScene::TouchesBegan(Touch* touch, Event* event) {
 }
 
 void gameScene::calCombo(Point curPos,bool stopped) {
+	//计算Combo数量
 	if (!stopped) {
 		comboNum++;
 		if (comboNum >= 3) {
@@ -259,6 +255,7 @@ void gameScene::calCombo(Point curPos,bool stopped) {
 			Size visibleSize = Director::getInstance()->getVisibleSize();
 			showCombo->setPosition(Point(curPos.x+60,curPos.y-20));
 			showCombo->setCascadeOpacityEnabled(true);
+			//渐入动画
 			ActionInterval* forwardOut = FadeOut::create(0.5f);
 			ActionInterval* forwardIn = FadeIn::create(0.5f);
 			Action* action = Sequence::create(forwardIn, forwardOut, NULL);
