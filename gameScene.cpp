@@ -11,6 +11,7 @@
 #include "AudioEngine.h"
 #include "GamePause.h"
 #include "GameQuit.h"
+#include "mainScene.h"
 using namespace cocos2d;
 using namespace experimental;
 Scene* gameScene::createScene() {
@@ -144,6 +145,11 @@ void gameScene::createUI() {
 	//CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("revolution.mp3", true);
 	backgroundMusicID = AudioEngine::play2d("revolution.mp3");
 	AudioEngine::setVolume(backgroundMusicID, 0.5);
+	AudioEngine::setFinishCallback(backgroundMusicID, [&](int id, const std::string& filePath) {
+			auto scene = mainScene::createScene();
+			TransitionFade* trans = TransitionFade::create(1, scene);
+			Director::getInstance()->replaceScene(trans);
+		});
 	particleSystem = ParticleSystemQuad::create("falling-dust.plist");
 	//particleSystem->setBlendAdditive(true);
 	particleSystem->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2 - 250));
